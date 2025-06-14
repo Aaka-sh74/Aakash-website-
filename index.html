@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <base target="_self">
+    <title>AG Collection - Premium Footwear</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@preline/preline@2.0.0/dist/preline.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#FF6B6B',
+                        secondary: '#4ECDC4',
+                        accent: '#FFE66D',
+                        dark: '#292F36',
+                        light: '#F7FFF7',
+                        pink: '#FF9E9E',
+                        teal: '#4ECDC4',
+                        yellow: '#FFE66D'
+                    },
+                    animation: {
+                        'bounce-slow': 'bounce 3s infinite',
+                        'pulse-slow': 'pulse 3s infinite'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .shoe-card {
+            transition: all 0.3s ease;
+            transform-style: preserve-3d;
+        }
+        .shoe-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+        .discount-badge {
+            animation: pulse 2s infinite;
+        }
+        .cart-item {
+            transition: all 0.3s ease;
+        }
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        .floating {
+            animation: float 4s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-pink-50 to-teal-50 min-h-screen">
+    <!-- Animated Background Elements -->
+    <div class="fixed top-20 left-10 w-16 h-16 rounded-full bg-primary/20 blur-xl"></div>
+    <div class="fixed bottom-1/4 right-20 w-24 h-24 rounded-full bg-accent/20 blur-xl"></div>
+    <div class="fixed top-1/3 right-1/4 w-20 h-20 rounded-full bg-secondary/20 blur-xl"></div>
+
+    <!-- Navigation -->
+    <nav class="bg-white/80 backdrop-blur-md shadow-lg sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <i class="fas fa-shoe-prints text-3xl text-primary floating"></i>
+                <h1 class="text-3xl font-extrabold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">AG Collection</h1>
+            </div>
+            <div class="flex items-center space-x-6">
+                <button id="cartBtn" class="relative group">
+                    <i class="fas fa-shopping-cart text-2xl text-dark group-hover:text-primary transition"></i>
+                    <span id="cartCount" class="absolute -top-2 -right-2 bg-primary text-white text-xs font-bold rounded-full h-6 w-6 flex items-center justify-center shadow-md">0</span>
+                </button>
+                <button id="adminBtn" class="bg-gradient-to-r from-primary to-secondary text-white px-5 py-2 rounded-full font-bold hover:opacity-90 transition shadow-lg hover:shadow-primary/30">
+                    <i class="fas fa-cog mr-2"></i> Admin Panel
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="py-16 px-4 relative overflow-hidden">
+        <div class="container mx-auto text-center relative z-10">
+            <h2 class="text-5xl md:text-6xl font-extrabold text-dark mb-6">Step Into <span class="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">Style</span></h2>
+            <p class="text-xl text-gray-700 max-w-2xl mx-auto mb-8">Discover exclusive footwear that combines comfort with cutting-edge design</p>
+            <div class="flex justify-center space-x-4">
+                <button class="bg-gradient-to-r from-primary to-secondary text-white px-8 py-3 rounded-full font-bold hover:opacity-90 transition shadow-lg hover:shadow-primary/30">
+                    Shop Collection
+                </button>
+                <button class="border-2 border-dark text-dark px-8 py-3 rounded-full font-bold hover:bg-dark hover:text-white transition">
+                    New Arrivals
+                </button>
+            </div>
+        </div>
+        <div class="absolute -bottom-20 -right-20 w-64 h-64 bg-primary/10 rounded-full blur-3xl"></div>
+    </section>
+
+    <!-- Shoe Grid -->
+    <section class="py-12 px-4" id="shoeGrid">
+        <div class="container mx-auto">
+            <h2 class="text-3xl font-bold text-dark mb-2 text-center">Featured Collection</h2>
+            <p class="text-gray-600 text-center mb-10">Handpicked selection of premium footwear</p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8" id="shoeContainer">
+                <!-- Shoes will be dynamically inserted here -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Admin Modal -->
+    <div id="adminModal" class="hs-overlay hidden size-full fixed top-0 start-0 z-[80] overflow-x-hidden overflow-y-auto">
+        <div class="hs-overlay-open:mt-7 hs-overlay-open:opacity-100 hs-overlay-open:duration-500 mt-0 opacity-0 ease-out transition-all sm:max-w-lg sm:w-full m-3 sm:mx-auto">
+            <div class="bg-white border border-gray-200 rounded-xl shadow-2xl overflow-hidden">
+                <div class="bg-gradient-to-r from-primary to-secondary p-4">
+                    <div class="flex justify-between items-center">
+                        <h3 class="text-xl font-bold text-white">Admin Panel</h3>
+                        <button type="button" class="flex justify-center items-center size-7 text-sm font-semibold rounded-full bg-white/20 text-white hover:bg-white/30" data-hs-overlay="#adminModal">
+                            <span class="sr-only">Close</span>
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="p-4 sm:p-6">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium mb-1" for="shoeName">Shoe Name</label>
+                            <input type="text" id="shoeName" class="py-3 px-4 block w-full border border-gray-200 rounded-lg text-sm focus:border-primary focus:ring-primary">
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium mb-1" for="shoePrice">Price (NRs)</label>
+                                <input type="number" id="shoePrice" class="py-3 px-4 block w-full border border-gray-200 rounded-lg text-sm focus:border-primary focus:ring-primary">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-1" for="shoeDiscount">Discount (%)</label>
+                                <input type="number" id="shoeDiscount" class="py-3 px-4 block w-full border border-gray-200 rounded-lg text-sm focus:border-primary focus:ring-primary" min="0" max="100">
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium mb-1" for="shoeImage">Image URL</label>
+                            <input type="text" id="shoeImage" class="py-3 px-4 block w-full border border-gray-200 rounded-lg text-sm focus:border-primary focus:ring-primary" placeholder="https://example.com/image.jpg">
+                        </div>
+                        
+                        <div class="flex justify-between space-x-2 pt-2">
+                            <button id="addShoeBtn" class="flex-1 py-3 px-4 inline-flex justify-center items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent bg-gradient-to-r from-primary to-secondary text-white hover:opacity-90">
+                                <i class="fas fa-plus mr-1"></i> Add Shoe
+                            </button>
+                            <button id="updateShoeBtn" class="flex-1 py-3 px-4 inline-flex justify-center items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent bg-teal-500 text-white hover:bg-teal-600 hidden">
+                                <i class="fas fa-save mr-1"></i> Update
+                            </button>
+                            <button id="cancelEditBtn" class="flex-1 py-3 px-4 inline-flex justify-center items-center gap-x-2 text-sm font-semibold rounded-lg border border-gray-200 text-gray-800 hover:bg-gray-100 hidden">
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-8">
+                        <h4 class="text-lg font-bold text-dark mb-4 pb-2 border-b">Current Shoes</h4>
+                        <div class="space-y-3" id="adminShoeList">
+                            <!-- Admin shoe list will be populated here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cart Sidebar -->
+    <div id="cartSidebar" class="hs-overlay hs-overlay-open:translate-x-0 hidden translate-x-full fixed top-0 end-0 transition-all duration-300 transform h-full max-w-md w-full z-[80] bg-white border-s shadow-2xl">
+        <div class="flex justify-between items-center py-4 px-6 border-b bg-gradient-to-r from-primary to-secondary">
+            <h3 class="font-bold text-white text-lg">Your Shopping Cart</h3>
+            <button type="button" class="flex justify-center items-center size-7 text-sm font-semibold rounded-full bg-white/20 text-white hover:bg-white/30" data-hs-overlay="#cartSidebar">
+                <span class="sr-only">Close</span>
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <div class="p-4 h-[calc(100%-180px)] overflow-y-auto" id="cartItems">
+            <!-- Cart items will be added here -->
+            <div class="text-center py-10 text-gray-500" id="emptyCartMessage">
+                <i class="fas fa-shopping-cart text-4xl mb-3 text-gray-300"></i>
+                <p class="text-gray-500">Your cart is empty</p>
+                <button class="mt-4 text-primary font-medium hover:underline" data-hs-overlay="#cartSidebar">Continue Shopping</button>
+            </div>
+        </div>
+        
+        <div class="absolute bottom-0 start-0 end-0 p-6 border-t bg-white">
+            <div class="flex justify-between mb-4">
+                <span class="font-bold text-lg">Total:</span>
+                <span class="font-bold text-xl text-primary" id="cartTotal">NRs 0.00</span>
+            </div>
+            <button id="checkoutBtn" class="w-full py-3 px-4 inline-flex justify-center items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent bg-gradient-to-r from-primary to-secondary text-white hover:opacity-90 shadow-md">
+                <i class="fas fa-credit-card mr-1"></i> Proceed to Checkout
+            </button>
+        </div>
+    </div>
+
+    <!-- Checkout Modal -->
+    <div id="checkoutModal" class="hs-overlay hidden size-full fixed top-0 start-0 z-[80] overflow-x-hidden overflow-y-auto">
+        <div class="hs-overlay-open:mt-7 hs-overlay-open:opacity-100 hs-overlay-open:duration-500 mt-0 opacity-0 ease-out transition-all sm:max-w-lg sm:w-full m-3 sm:mx-auto">
+            <div class="bg-white border border-gray-200 rounded-xl shadow-2xl overflow-hidden">
+                <div class="bg-gradient-to-r from-primary to-secondary p-4">
+                    <div class="flex justify-between items-center">
+                        <h3 class="text-xl font-bold text-white">Complete Your Order</h3>
+                        <button type="button" class="flex justify-center items-center size-7 text-sm font-semibold rounded-full bg-white/20 text-white hover:bg-white/30" data-hs-overlay="#checkoutModal">
+                            <span class="sr-only">Close</span>
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="p-4 sm:p-6">
+                    <div class="space-y-5">
+                        <div>
+                            <label class="block text-sm font-medium mb-1" for="customerName">Full Name</label>
+                            <input type="text" id="customerName" class="py-3 px-4 block w-full border border-gray-200 rounded-lg text-sm focus:border-primary focus:ring-primary" required>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium mb-1" for="customerPhone">Phone Number</label>
+                            <input type="tel" id="customerPhone" class="py-3 px-4 block w-full border border-gray-200 rounded-lg text-sm focus:border-primary focus:ring-primary" required>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium mb-1" for="customerAddress">Delivery Address</label>
+                            <textarea id="customerAddress" rows="3" class="py-3 px-4 block w-full border border-gray-200 rounded-lg text-sm focus:border-primary focus:ring-primary" required></textarea>
+                        </div>
+                        
+                        <div class="pt-4">
+                            <h4 class="text-lg font-bold text-dark mb-3">Payment Method</h4>
+                            <div class="space-y-3">
+                                <div class="flex items-center p-3 border rounded-lg hover:border-primary cursor-pointer">
+                                    <input type="radio" id="cashOnDelivery" name="paymentMethod" class="shrink-0 mt-0.5 border-gray-200 rounded-full text-primary focus:ring-primary" checked>
+                                    <label for="cashOnDelivery" class="text-sm text-gray-800 ms-3">
+                                        <span class="block font-medium">Cash on Delivery</span>
+                                        <span class="text-gray-500">Pay when you receive your order</span>
+                                    </label>
+                                </div>
+                                
+                                <div class="flex items-center p-3 border rounded-lg hover:border-primary cursor-pointer">
+                                    <input type="radio" id="qrPayment" name="paymentMethod" class="shrink-0 mt-0.5 border-gray-200 rounded-full text-primary focus:ring-primary">
+                                    <label for="qrPayment" class="text-sm text-gray-800 ms-3">
+                                        <span class="block font-medium">QR Code Payment</span>
+                                        <span class="text-gray-500">Scan to pay instantly</span>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div id="qrPaymentSection" class="mt-4 hidden">
+                                <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center bg-gray-50">
+                                    <div class="mb-3">
+                                        <img id="qrCodeImage" src="https://via.placeholder.com/200x200?text=Upload+QR+Code" alt="QR Code" class="mx-auto w-48 h-48 object-contain bg-white p-2 rounded">
+                                    </div>
+                                    <button id="uploadQrBtn" class="py-2 px-4 inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-gray-200 text-gray-800 hover:bg-gray-100">
+                                        <i class="fas fa-upload me-1"></i> Upload QR Code
+                                    </button>
+                                    <input type="file" id="qrCodeInput" accept="image/*" class="hidden">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <button id="placeOrderBtn" class="w-full py-3 px-4 inline-flex justify-center items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent bg-gradient-to-r from-primary to-secondary text-white hover:opacity-90 mt-4">
+                            <i class="fas fa-paper-plane me-1"></i> Place Order
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Order Confirmation Modal -->
+    <div id="orderConfirmation" class="hs-overlay hidden size-full fixed top-0 start-0 z-[80] overflow-x-hidden overflow-y-auto">
+        <div class="hs-overlay-open:mt-7 hs-overlay-open:opacity-100 hs-overlay-open:duration-500 mt-0 opacity-0 ease-out transition-all sm:max-w-lg sm:w-full m-3 sm:mx-auto">
+            <div class="bg-white border border-gray-200 rounded-xl shadow-2xl overflow-hidden text-center">
+                <div class="bg-gradient-to-r from-primary to-secondary p-6">
+                    <div class="mx-auto flex items-center justify-center size-16 bg-white rounded-full mb-4">
+                        <i class="fas fa-check text-primary text-2xl"></i>
+                    </div>
+                </div>
+                <div class="p-6 sm:p-8">
+                    <h3 class="text-2xl font-bold text-dark mb-3">Order Confirmed!</h3>
+                    <p class="text-gray-600 mb-6">Thank you for shopping with AG Collection. Your order will be delivered soon.</p>
+                    <div class="mb-6">
+                        <div class="inline-flex items-center justify-center bg-gray-100 rounded-full px-4 py-2">
+                            <i class="fas fa-receipt text-primary mr-2"></i>
+                            <span class="font-medium">Order #AG-${Math.floor(1000 + Math.random() * 9000)}</span>
+                        </div>
+                    </div>
+                    <button type="button" class="w-full py-3 px-4 inline-flex justify-center items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent bg-gradient-to-r from-primary to-secondary text-white hover:opacity-90" data-hs-overlay="#orderConfirmation">
+                        Continue Shopping
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample shoe data
+        let shoes = [
+            {
+                id: 1,
+                name: "Urban Runner Pro",
+                price: 12999,
+                discount: 20,
+                image: "https://images.unsplash.com/photo-1600269452121-4f2416e55c28?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80"
+            },
+            {
+                id: 2,
+                name: "Classic White Sneakers",
+                price: 8950,
+                discount: 15,
+                image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80"
+            },
+            {
+                id: 3,
+                name: "Sport Boost 2023",
+                price: 15900,
+                discount: 25,
+                image: "https://images.unsplash.com/photo-1600185365483-26d7a4cc7519?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80"
+            },
+            {
+                id: 4,
+                name: "Retro High Tops",
+                price: 11000,
+                discount: 10,
+                image: "https://images.unsplash.com/photo-1605348532760-6753d2c43329?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80"
+            },
+            {
+                id: 5,
+                name: "Casual Comfort Walkers",
+                price: 7500,
+                discount: 0,
+                image: "https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80"
+            },
+            {
+                id: 6,
+                name: "Luxury Leather Loafers",
+                price: 19900,
+                discount: 30,
+                image: "https://images.unsplash.com/photo-1560769629-975ec94e6a86?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80"
+            },
+            {
+                id: 7,
+                name: "Running Cloud",
+                price: 13500,
+                discount: 10,
+                image: "https://images.unsplash.com/photo-1491553895911-0055eca6402d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80"
+            },
+            {
+                id: 8,
+                name: "Basketball Pro",
+                price: 14500,
+                discount: 15,
+                image: "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80"
+            }
+        ];
+
+        let cart = [];
+        let editingShoeId = null;
+
+        // DOM Elements
+        const shoeContainer = document.getElementById('shoeContainer');
+        const cartItems = document.getElementById('cartItems');
+        const cartCount = document.getElementById('cartCount');
+        const cartTotal = document.getElementById('cartTotal');
+        const emptyCartMessage = document.getElementById('emptyCartMessage');
+        const adminShoeList = document.getElementById('adminShoeList');
+        const qrPaymentSection = document.getElementById('qrPaymentSection');
+        const qrCodeInput = document.getElementById('qrCodeInput');
+        const qrCodeImage = document.getElementById('qrCodeImage');
+
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', function() {
+            renderShoes();
+            setupEventListeners();
+        });
+
+        // Render shoes to the page
+        function renderShoes() {
+            shoeContainer.innerHTML = '';
+            shoes.forEach(shoe => {
+                const discountedPrice = shoe.price - (shoe.price * (shoe.discount / 100));
+                
+                const shoeCard = document.createElement('div');
+                shoeCard.className = 'shoe-card bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 relative';
+                shoeCard.innerHTML = `
+                    <div class="relative overflow-hidden">
+                        <img src="${shoe.image}" alt="${shoe.name}" class="w-full h-72 object-cover hover:scale-105 transition duration-500">
+                        ${shoe.discount > 0 ? `
+                            <span class="discount-badge absolute top-4 right-4 bg-accent text-dark font-bold px-3 py-1 rounded-full shadow-md">
+                                ${shoe.discount}% OFF
+                            </span>
+                        ` : ''}
+                        <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4">
+                            <h3 class="text-xl font-bold text-white">${shoe.name}</h3>
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                ${shoe.discount > 0 ? `
+                                    <span class="text-gray-500 line-through text-sm">NRs ${shoe.price.toLocaleString()}</span>
+                                    <span class="text-primary font-bold text-lg block">NRs ${discountedPrice.toLocaleString()}</span>
+                                ` : `
+                                    <span class="text-primary font-bold text-lg">NRs ${shoe.price.toLocaleString()}</span>
+                                `}
+                            </div>
+                            <button class="add-to-cart bg-gradient-to-r from-primary to-secondary text-white px-4 py-2 rounded-lg font-medium hover:opacity-90 transition shadow-md" data-id="${shoe.id}">
+                                <i class="fas fa-cart-plus me-1"></i> Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                `;
+                shoeContainer.appendChild(shoeCard);
+            });
+            
+            // Render admin shoe list
+            renderAdminShoeList();
+        }
+
+        // Render admin shoe list
+        function renderAdminShoeList() {
+            adminShoeList.innerHTML = '';
+            shoes.forEach(shoe => {
+                const shoeItem = document.createElement('div');
+                shoeItem.className = 'flex justify-between items-center p-3 border rounded-lg hover:border-primary transition';
+                shoeItem.innerHTML = `
+                    <div class="flex items-center space-x-4">
+                        <img src="${shoe.image}" alt="${shoe.name}" class="w-14 h-14 object-cover rounded-lg">
+                        <div>
+                            <h4 class="font-bold">${shoe.name}</h4>
+                            <div class="flex items-center space-x-2">
+                                ${shoe.discount > 0 ? `
+                                    <span class="text-primary font-medium">NRs ${(shoe.price - (shoe.price * (shoe.discount / 100))).toLocaleString()}</span>
+                                    <span class="text-gray-500 text-sm line-through">NRs ${shoe.price.toLocaleString()}</span>
+                                    <span class="text-xs bg-accent/20 text-accent px-2 py-0.5 rounded-full">${shoe.discount}% OFF</span>
+                                ` : `
+                                    <span class="text-primary font-medium">NRs ${shoe.price.toLocaleString()}</span>
+                                `}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex space-x-2">
+                        <button class="edit-shoe p-2 text-white bg-primary rounded-lg hover:bg-primary/90" data-id="${shoe.id}">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="delete-shoe p-2 text-white bg-red-500 rounded-lg hover:bg-red-600" data-id="${shoe.id}">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                `;
+                adminShoeList.appendChild(shoeItem);
+            });
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Cart button
+            document.getElementById('cartBtn').addEventListener('click', function(e) {
+                e.preventDefault();
+                const overlay = document.getElementById('cartSidebar');
+                overlay.classList.toggle('hidden');
+            });
+
+            // Admin button
+            document.getElementById('adminBtn').addEventListener('click', function(e) {
+                e.preventDefault();
+                const overlay = document.getElementById('adminModal');
+                overlay.classList.toggle('hidden');
+            });
+
+            // Add to cart buttons (delegated)
+            document.addEventListener('click', function(e) {
+                if (e.target.classList.contains('add-to-cart') || e.target.closest('.add-to-cart')) {
+                    const button = e.target.classList.contains('add-to-cart') ? e.target : e.target.closest('.add-to-cart');
+                    const shoeId = parseInt(button.getAttribute('data-id'));
+                    addToCart(shoeId);
+                }
+                
+                // Edit shoe buttons in admin panel
+                if (e.target.classList.contains('edit-shoe') || e.target.closest('.edit-shoe')) {
+                    const button = e.target.classList.contains('edit-shoe') ? e.target : e.target.closest('.edit-shoe');
+                    const shoeId = parseInt(button.getAttribute('data-id'));
+                    editShoe(shoeId);
+                }
+                
+                // Delete shoe buttons in admin panel
+                if (e.target.classList.contains('delete-shoe') || e.target.closest('.delete-shoe')) {
+                    const button = e.target.classList.contains('delete-shoe') ? e.target : e.target.closest('.delete-shoe');
+                    const shoeId = parseInt(button.getAttribute('data-id'));
+                    deleteShoe(shoeId);
+                }
+            });
+
+            // Add shoe button
+            document.getElementById('addShoeBtn').addEventListener('click', addNewShoe);
+
+            // Update shoe button
+            document.getElementById('updateShoeBtn').addEventListener('click', updateShoe);
+
+            // Cancel edit button
+            document.getElementById('cancelEditBtn').addEventListener('click', cancelEdit);
+
+            // Checkout button
+            document.getElementById('checkoutBtn').addEventListener('click', function(e) {
+                e.preventDefault();
+                if (cart.length === 0) return;
+                
+                const overlay = document.getElementById('checkoutModal');
+                overlay.classList.toggle('hidden');
+                document.getElementById('cartSidebar').classList.add('hidden');
+            });
+
+            // Payment method radio buttons
+            document.querySelectorAll('input[name="paymentMethod"]').forEach(radio => {
+                radio.addEventListener('change', function() {
+                    if (this.id === 'qrPayment') {
+                        qrPaymentSection.classList.remove('hidden');
+                    } else {
+                        qrPaymentSection.classList.add('hidden');
+                    }
+                });
+            });
+
+            // Upload QR code button
+            document.getElementById('uploadQrBtn').addEventListener('click', function() {
+                qrCodeInput.click();
+            });
+
+            // QR code input change
+            qrCodeInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        qrCodeImage.src = event.target.result;
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            // Place order button
+            document.getElementById('placeOrderBtn').addEventListener('click', placeOrder);
+        }
+
+        // Add to cart function
+        function addToCart(shoeId) {
+            const shoe = shoes.find(s => s.id === shoeId);
+            if (!shoe) return;
+            
+            const existingItem = cart.find(item => item.id === shoeId);
+            if (existingItem) {
+                existingItem.quantity += 1;
+            } else {
+                cart.push({
+                    id: shoe.id,
+                    name: shoe.name,
+                    price: shoe.price - (shoe.price * (shoe.discount / 100)),
+                    quantity: 1,
+                    image: shoe.image
+                });
+            }
+            
+            updateCart();
+            
+            // Show success message
+            const button = document.querySelector(`.add-to-cart[data-id="${shoeId}"]`);
+            const originalHTML = button.innerHTML;
+            button.innerHTML = '<i class="fas fa-check me-1"></i> Added';
+            button.classList.remove('from-primary', 'to-secondary');
+            button.classList.add('bg-green-500');
+            
+            setTimeout(() => {
+                button.innerHTML = originalHTML;
+                button.classList.add('from-primary', 'to-secondary');
+                button.classList.remove('bg-green-500');
+            }, 1500);
+        }
+
+        // Update cart display
+        function updateCart() {
+            cartItems.innerHTML = '';
+            
+            if (cart.length === 0) {
+                emptyCartMessage.classList.remove('hidden');
+                cartCount.textContent = '0';
+                cartTotal.textContent = 'NRs 0';
+                return;
+            }
+            
+            emptyCartMessage.classList.add('hidden');
+            
+            let total = 0;
+            cart.forEach(item => {
+                const itemTotal = item.price * item.quantity;
+                total += itemTotal;
+                
+                const cartItem = document.createElement('div');
+                cartItem.className = 'flex items-center justify-between p-3 border-b cart-item';
+                cartItem.innerHTML = `
+                    <div class="flex items-center space-x-4">
+                        <img src="${item.image}" alt="${item.name}" class="w-16 h-16 object-cover rounded-lg">
+                        <div>
+                            <h4 class="font-medium">${item.name}</h4>
+                            <p class="text-primary font-bold">NRs ${item.price.toLocaleString()}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <div class="flex items-center space-x-2 bg-gray-100 rounded-lg px-2">
+                            <button class="decrease-quantity p-1 text-gray-500 hover:text-primary" data-id="${item.id}">
+                                <i class="fas fa-minus text-xs"></i>
+                            </button>
+                            <span class="font-medium">${item.quantity}</span>
+                            <button class="increase-quantity p-1 text-gray-500 hover:text-primary" data-id="${item.id}">
+                                <i class="fas fa-plus text-xs"></i>
+                            </button>
+                        </div>
+                        <button class="remove-item p-2 text-red-500 hover:bg-red-50 rounded-lg" data-id="${item.id}">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                `;
+                cartItems.appendChild(cartItem);
+            });
+            
+            // Update cart count and total
+            const itemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+            cartCount.textContent = itemCount;
+            cartTotal.textContent = `NRs ${total.toLocaleString()}`;
+            
+            // Add event listeners for quantity buttons
+            document.querySelectorAll('.increase-quantity').forEach(button => {
+                button.addEventListener('click', function() {
+                    const itemId = parseInt(this.getAttribute('data-id'));
+                    const item = cart.find(item => item.id === itemId);
+                    if (item) {
+                        item.quantity += 1;
+                        updateCart();
+                    }
+                });
+            });
+            
+            document.querySelectorAll('.decrease-quantity').forEach(button => {
+                button.addEventListener('click', function() {
+                    const itemId = parseInt(this.getAttribute('data-id'));
+                    const item = cart.find(item => item.id === itemId);
+                    if (item && item.quantity > 1) {
+                        item.quantity -= 1;
+                        updateCart();
+                    }
+                });
+            });
+            
+            document.querySelectorAll('.remove-item').forEach(button => {
+                button.addEventListener('click', function() {
+                    const itemId = parseInt(this.getAttribute('data-id'));
+                    cart = cart.filter(item => item.id !== itemId);
+                    updateCart();
+                });
+            });
+        }
+
+        // Add new shoe
+        function addNewShoe() {
+            const name = document.getElementById('shoeName').value.trim();
+            const price = parseFloat(document.getElementById('shoePrice').value);
+            const discount = parseInt(document.getElementById('shoeDiscount').value) || 0;
+            const image = document.getElementById('shoeImage').value.trim();
+            
+            if (!name || isNaN(price) || !image) {
+                alert('Please fill all required fields');
+                return;
+            }
+            
+            const newShoe = {
+                id: shoes.length > 0 ? Math.max(...shoes.map(s => s.id)) + 1 : 1,
+                name,
+                price,
+                discount,
+                image
+            };
+            
+            shoes.push(newShoe);
+            renderShoes();
+            
+            // Clear form
+            document.getElementById('shoeName').value = '';
+            document.getElementById('shoePrice').value = '';
+            document.getElementById('shoeDiscount').value = '';
+            document.getElementById('shoeImage').value = '';
+            
+            // Show success message
+            const addBtn = document.getElementById('addShoeBtn');
+            const originalHTML = addBtn.innerHTML;
+            addBtn.innerHTML = '<i class="fas fa-check me-1"></i> Added!';
+            addBtn.classList.remove('from-primary', 'to-secondary');
+            addBtn.classList.add('bg-green-500');
+            
+            setTimeout(() => {
+                addBtn.innerHTML = originalHTML;
+                addBtn.classList.add('from-primary', 'to-secondary');
+                addBtn.classList.remove('bg-green-500');
+            }, 1500);
+        }
+
+        // Edit shoe
+        function editShoe(shoeId) {
+            const shoe = shoes.find(s => s.id === shoeId);
+            if (!shoe) return;
+            
+            editingShoeId = shoeId;
+            
+            document.getElementById('shoeName').value = shoe.name;
+            document.getElementById('shoePrice').value = shoe.price;
+            document.getElementById('shoeDiscount').value = shoe.discount;
+            document.getElementById('shoeImage').value = shoe.image;
+            
+            document.getElementById('addShoeBtn').classList.add('hidden');
+            document.getElementById('updateShoeBtn').classList.remove('hidden');
+            document.getElementById('cancelEditBtn').classList.remove('hidden');
+        }
+
+        // Update shoe
+        function updateShoe() {
+            if (editingShoeId === null) return;
+            
+            const name = document.getElementById('shoeName').value.trim();
+            const price = parseFloat(document.getElementById('shoePrice').value);
+            const discount = parseInt(document.getElementById('shoeDiscount').value) || 0;
+            const image = document.getElementById('shoeImage').value.trim();
+            
+            if (!name || isNaN(price) || !image) {
+                alert('Please fill all required fields');
+                return;
+            }
+            
+            const shoeIndex = shoes.findIndex(s => s.id === editingShoeId);
+            if (shoeIndex !== -1) {
+                shoes[shoeIndex] = {
+                    id: editingShoeId,
+                    name,
+                    price,
+                    discount,
+                    image
+                };
+                
+                renderShoes();
+                cancelEdit();
+                
+                // Show success message
+                const updateBtn = document.getElementById('updateShoeBtn');
+                const originalHTML = updateBtn.innerHTML;
+                updateBtn.innerHTML = '<i class="fas fa-check me-1"></i> Updated!';
+                updateBtn.classList.remove('bg-teal-500');
+                updateBtn.classList.add('bg-green-500');
+                
+                setTimeout(() => {
+                    updateBtn.innerHTML = originalHTML;
+                    updateBtn.classList.add('bg-teal-500');
+                    updateBtn.classList.remove('bg-green-500');
+                }, 1500);
+            }
+        }
+
+        // Cancel edit
+        function cancelEdit() {
+            editingShoeId = null;
+            
+            document.getElementById('shoeName').value = '';
+            document.getElementById('shoePrice').value = '';
+            document.getElementById('shoeDiscount').value = '';
+            document.getElementById('shoeImage').value = '';
+            
+            document.getElementById('addShoeBtn').classList.remove('hidden');
+            document.getElementById('updateShoeBtn').classList.add('hidden');
+            document.getElementById('cancelEditBtn').classList.add('hidden');
+        }
+
+        // Delete shoe
+        function deleteShoe(shoeId) {
+            if (confirm('Are you sure you want to delete this shoe?')) {
+                shoes = shoes.filter(s => s.id !== shoeId);
+                renderShoes();
+                
+                // Also remove from cart if present
+                cart = cart.filter(item => item.id !== shoeId);
+                updateCart();
+            }
+        }
+
+        // Place order
+        function placeOrder() {
+            const name = document.getElementById('customerName').value.trim();
+            const phone = document.getElementById('customerPhone').value.trim();
+            const address = document.getElementById('customerAddress').value.trim();
+            const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').id;
+            
+            if (!name || !phone || !address) {
+                alert('Please fill all required fields');
+                return;
+            }
+            
+            // In a real app, you would send this data to your backend
+            console.log('Order placed:', {
+                customer: { name, phone, address },
+                paymentMethod,
+                items: cart,
+                total: cart.reduce((sum, item) => sum + (item.price * item.quantity), 0)
+            });
+            
+            // Show confirmation
+            document.getElementById('checkoutModal').classList.add('hidden');
+            document.getElementById('orderConfirmation').classList.remove('hidden');
+            
+            // Clear cart
+            cart = [];
+            updateCart();
+            
+            // Reset form
+            document.getElementById('customerName').value = '';
+            document.getElementById('customerPhone').value = '';
+            document.getElementById('customerAddress').value = '';
+            document.querySelector('input[name="paymentMethod"][value="cashOnDelivery"]').checked = true;
+            qrPaymentSection.classList.add('hidden');
+        }
+    </script>
+</body>
+</html>
